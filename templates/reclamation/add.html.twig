@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="card shadow-lg border-0 rounded-lg mt-5">
+<div class="card-header"><h3 class="text-center font-weight-light my-4">Contact Us</h3></div>
+<div class="card-body">
+    <div class="small mb-3 text-muted">Contact</div>
+    <div class="form-floating mb-3">
+        {{form_start(f)}}
+            
+
+             {{form_label(f.contenu)}}
+             {{form_widget(f.contenu)}}
+             {{form_errors(f.contenu)}}
+<br>
+    
+            {{form_widget(f.Send)}}
+ </div>
+     </div>    
+</div>
+</div>
+</div>
+
+
+{{form_end(f)}}
+{% endblock %}

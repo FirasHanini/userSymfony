@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+ <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-7">
+                                <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                    <div class="card-header"><h3 class="text-center font-weight-light my-4">Create Account</h3></div>
+                                    <div class="card-body">
+{{form_start(f)}}
+{{form_label(f.nom)}}
+{{form_widget(f.nom)}}
+{{form_errors(f.nom)}}
+
+{{form_label(f.prenom)}}
+{{form_widget(f.prenom)}}
+{{form_errors(f.prenom)}}
+
+{{form_label(f.username)}}
+{{form_widget(f.username)}}
+{{form_errors(f.username)}}
+
+{{form_label(f.email)}}
+{{form_widget(f.email)}}
+{{form_errors(f.email)}}
+
+{{form_label(f.password)}}
+{{form_widget(f.password)}}
+{{form_errors(f.password)}}
+
+{{form_label(f.type)}}
+{{form_widget(f.type)}}
+{{form_errors(f.type)}}
+
+{{form_label(f.DateNaissance)}}
+{{form_widget(f.DateNaissance)}}
+{{form_errors(f.DateNaissance)}}
+
+          
+
+
+
+
+
+
+{{form_label(f.cin)}}
+{{form_widget(f.cin)}}
+{{form_errors(f.cin)}}
+
+
+
+{{form_label(f.pic)}}
+{{form_widget(f.pic)}}
+{{form_errors(f.pic)}}
+
+<br>
+
+
+
+{{form_widget(f.Register)}}
+
+
+
+
+{{form_end(f)}}
+</div>
+                                    <div class="card-footer text-center py-3">
+                                        <div class="small"><a href="{{path('login_utilisateur')}}">Have an account? Go to login</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+{% endblock%}

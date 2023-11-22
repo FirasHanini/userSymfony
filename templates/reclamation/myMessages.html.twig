@@ -1,0 +1,58 @@
+{% extends 'connected.html.twig' %}
+
+{% block body %}
+
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table me-1"></i>
+         My Messages
+    </div>
+    <div class="card-body">
+        <table id="datatablesSimple">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Sender Name</th>
+                    <th>State</th>
+                    <th>Delete</th>
+
+                    
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th>Id</th>
+                    <th>Sender Name</th>
+                    <th>State</th>
+                    <th>Delete</th>
+                    
+                    
+                </tr>
+            </tfoot>
+            <tbody>
+                                        
+                                        
+            {% for a in list %}
+                                    
+            <tr>
+                <td>{{a.id}} </td>
+                <td>{{a.sender.nom}} </td>
+                <td>{{a.etat}} </td>
+                <td><a href={{path('delete_reclamation',{id:a.id})}} <i class="fa-solid fa-trash-can fa-lg"></i> </td>
+                
+                                            
+            </tr>
+            {% endfor %}
+                                     
+                                       
+            </tbody>
+        </table>
+        <a href={{path('add_reclamation')}}>
+         <button type="button" class="btn btn-primary " >Send New Message <i class="fa-solid fa-paper-plane fa-sm"></i> </button>
+         </a>
+    </div>
+   
+</div>
+
+                   
+{% endblock %}
