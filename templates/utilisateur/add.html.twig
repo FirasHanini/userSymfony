@@ -25,9 +25,13 @@
 {{form_widget(f.email)}}
 {{form_errors(f.email)}}
 
+{% if l %}
+
 {{form_label(f.password)}}
 {{form_widget(f.password)}}
 {{form_errors(f.password)}}
+
+{% endif %}
 
 {{form_label(f.type)}}
 {{form_widget(f.type)}}

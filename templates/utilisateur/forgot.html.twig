@@ -18,24 +18,40 @@
                                     {{form_label(f.username)}}
                                     {{form_widget(f.username)}}
                                     {{form_errors(f.username)}}
-
-
-
-                                    {{form_label(f.password)}}
-                                    {{form_widget(f.password)}}
-                                    {{form_errors(f.password)}}
-
-                                    
-                                    
-                                    
-                                    <a href={{path('passwordForgot_utilisateur')}}>Forgot Password?</a>
-                                    <br>
-                                    <a href={{path('emailConnection_utilisateur')}}>Connect with your Email</a>
                                     <br>
 
 
+                                    {{form_widget(f.Send)}}
+                                    <br>
+                                    {{ form_end(f) }}
 
-                                    {{form_widget(f.Login)}}
+
+
+                                    {% if s %}
+
+
+
+                                    {{form_label(ff.code)}}
+                                    {{form_widget(ff.code)}}
+                                    {{form_errors(ff.code)}}
+
+                                    
+                                    <br>
+                                    
+                                    
+
+
+
+                                    {{form_widget(ff.Confirm)}}
+                                    {{ form_end(ff) }}
+
+                                    {% endif %}
+
+                                    
+
+
+
+
 
 
 
@@ -51,39 +67,6 @@
                 </main>
             </div
             </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

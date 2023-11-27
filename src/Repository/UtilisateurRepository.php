@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Utilisateur;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends ServiceEntityRepository<Utilisateur>
@@ -46,7 +47,7 @@ class UtilisateurRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-    public function getPaswwdByUsername(string $username)
+    public function getPaswwdByUsername(string $username): ?UserInterface
     {
         return $this->createQueryBuilder('b')
         

@@ -10,8 +10,14 @@
           <div class="row g-0">
             <div class="col-md-4 gradient-custom text-center text-black"
               style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+
+
+              <a href="{{ path('take_photo') }}">
               <img src="{{asset(user.pic)}}"
                 alt={{user.username}} class="img-fluid my-5" style="width: 80px;" />
+
+                </a>
+                
               <h5>{{user.nom}} {{user.prenom}} </h5>
               <p>{{user.type}}</p>
               <a href={{path('utilisateur_update',{id: user.id})}}>

@@ -6,6 +6,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UtilisateurRepository;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -13,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(fields: ["username"], message: "Username already exists")]
 #[UniqueEntity(fields: ["email"], message: "Email exists already")]
 #[UniqueEntity(fields: ["cin"], message: "Cin exists already")]
-class Utilisateur
+class Utilisateur implements PasswordAuthenticatedUserInterface, UserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -154,7 +156,7 @@ class Utilisateur
         return $this;
     }
 
-    public function getPassword(): ?string
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -190,9 +192,26 @@ class Utilisateur
         return $this;
     }
 
+    
 
 
-   
+    public function getUserIdentifier(): ?string
+    {
+        return $this->username;
+    }
 
+    public function getRoles()
+    {
+        return null;
+    }
+
+    public function getSalt()
+    {
+
+    }
+
+    public function eraseCredentials(){
+        
+    }
 
 }

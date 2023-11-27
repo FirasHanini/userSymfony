@@ -58,11 +58,16 @@ class ReclamationController extends AbstractController
     #[Route('/reclamer', name: 'add_reclamation')]
     public function add(ManagerRegistry $man, Request $req, SessionInterface $session,UtilisateurRepository $uRepo): Response
     {
-        
+        $user= $uRepo->find($session->get('user')->getId());
+        echo $user->getUsername();
+        if(!$user){
+            return $this->redirectToRoute('login_utilisateur');
+        }else{
+
         $rec=new Reclamation();
         $maanger=$man->getManager();
-        $user=new Utilisateur();
-        $user= $uRepo->find($session->get('user')->getId());
+       
+        
 
         
     
@@ -81,10 +86,15 @@ class ReclamationController extends AbstractController
             'f'=>$form
         ]);
     }
+    }
 
     #[Route('/reclamationanswer/{id}', name: 'answer_reclamation')]
-    public function answer(ManagerRegistry $man, Request $req, ReclamationRepository $repo,$id): Response
+    public function answer(ManagerRegistry $man, Request $req, ReclamationRepository $repo,$id, SessionInterface $session): Response
     {
+        $user=$session->get('user');
+        if(!$user){
+            return $this->redirectToRoute('login_utilisateur');
+        }else{
         
         $rec=$repo->find($id);
         $maanger=$man->getManager();
@@ -97,11 +107,12 @@ class ReclamationController extends AbstractController
 
             $maanger->persist($rec);
             $maanger->flush();
-            $this->redirectToRoute('all_reclamation');
+           return  $this->redirectToRoute('all_reclamation');
         }
         return $this->renderForm('reclamation/respond.html.twig',[
             'f'=>$form
         ]);
+    }
     }
 
 

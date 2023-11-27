@@ -29,11 +29,15 @@ class UtilisateurType extends AbstractType
             ->add('prenom', null,[
                 'attr' => ['placeholder' => 'Lastname'],
                 'label'=>'Lastname',] )
+
+                
             ->add('DateNaissance',BirthdayType::class, [
                 'attr' => ['placeholder' => 'BirthDate'],
                 'label'=>'Birth Date',
                 'mapped' => false,
                 ])
+
+
             ->add('cin', null, [
                 'attr' => ['placeholder' => 'CIN'],
                 'label'=>'CIN',])
@@ -47,6 +51,7 @@ class UtilisateurType extends AbstractType
             ->add('username', null, [
                 'attr' => ['placeholder' => 'Username'],
                 'label'=>'Username',])
+                
             ->add('password', PasswordType::class, [
                 'attr' => ['placeholder' => 'Password'],
                 'label'=>'Password',])

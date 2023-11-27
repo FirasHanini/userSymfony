@@ -68,4 +68,37 @@ class UtilisateurService{
         return $heureActuelle*$minutesActuelles*3600+$moisActuel*$jourActuel*1200;
     }
 
+
+
+    function isWeakPassword($password)
+{
+    
+    if (strlen($password) < 8) {
+        return true; 
+    }
+
+    
+    if (!preg_match('/[a-z]/', $password)) {
+        return true; 
+    }
+
+  
+    if (!preg_match('/[A-Z]/', $password)) {
+        return true;
+    }
+
+    
+    if (!preg_match('/[0-9]/', $password)) {
+        return true; 
+    }
+
+    
+    if (!preg_match('/[!@#$%^&*()\-_=+{};:,<.>]/', $password)) {
+        return true; 
+    }
+
+    return false;
+}
+
+
 }
