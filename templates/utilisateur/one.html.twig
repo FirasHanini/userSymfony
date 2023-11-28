@@ -12,22 +12,28 @@
               style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
 
 
+              {% if l%}
               <a href="{{ path('take_photo') }}">
               <img src="{{asset(user.pic)}}"
-                alt={{user.username}} class="img-fluid my-5" style="width: 80px;" />
+                alt={{user.username}} class="img-fluid my-5" style="width: 120px;" />
 
                 </a>
+                {% endif %}
+
+                {% if not l %}
+                <img src="{{asset(user.pic)}}"alt={{user.username}} class="img-fluid my-5" style="width: 80px;" />
+                 {% endif %}
                 
               <h5>{{user.nom}} {{user.prenom}} </h5>
               <p>{{user.type}}</p>
+              {% if l%}
               <a href={{path('utilisateur_update',{id: user.id})}}>
-              <i class="fa-solid fa-user-pen fa-lg" ></i>
+              <i class="fa-solid fa-user-pen fa-lg" ></i> Update Account 
               </a>
                
-               <br> <br> 
-               <a href={{path('delete_utilisateur',{id: user.id})}}>
-              <i class="fa-sharp fa-solid fa-trash  fa-lg"></i>
-              </a>
+               
+              
+              {% endif %}
               
             </div>
             <div class="col-md-8">
@@ -50,10 +56,21 @@
                   <div class="col-6 mb-3">
                     <h6>Email</h6>
                     <p class="text-muted">{{user.email}} </p>
+                    {% if l%}
+                    <br>
+                    <a href={{path('MDPRez_utilisateur')}} ><i class="fa-solid fa-key"></i>Update password ? </a>
+                    {% endif %}
                   </div>
                   <div class="col-6 mb-3">
                     <h6>CIN</h6>
                     <p class="text-muted">{{user.cin}} </p>
+                    {% if l%}
+                     <br> 
+               <a href={{path('delete_utilisateur',{id: user.id})}}>
+              <i class="fa-sharp fa-solid fa-trash  fa-lg"></i>Delete your account
+              </a>
+              {% endif %}
+                    
                   </div>
                 </div>
                 

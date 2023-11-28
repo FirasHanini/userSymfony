@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Form\UtilisateurType;
+use App\Form\UtilisateurUpdateType;
 use App\Repository\UtilisateurRepository;
 use App\Service\FileUploader;
 use App\Service\UtilisateurService;
@@ -45,6 +46,7 @@ class UtilisateurController extends AbstractController
     $maanger=$man->getManager();
     
     $form=$this->createForm(UtilisateurType::class,$user);
+    
     $form->handleRequest($req);
     if($form->isSubmitted()&& $form->isValid())
     {
@@ -71,6 +73,7 @@ class UtilisateurController extends AbstractController
         }
 
 
+        
         $user->setDateNaissance($dateNaissance->format('Y-m-d'));
         $user->setAge($service->calculAge($dateNaissance));
 
@@ -186,7 +189,8 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
 {
     $mR= $manager->getManager();
     $user= $repo->find($id);
-    $form=$this->createForm(UtilisateurType::class,$user);
+    $form=$this->createForm(UtilisateurUpdateType::class,$user);
+  //  $form->get('password')->setData($user->getPassword());
     $form->handleRequest($requ);
     if($form->isSubmitted()&& $form->isValid())
     {
@@ -210,7 +214,7 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
     $mR->persist($user);
     $mR->flush();
     
-    return $this->redirectToRoute('one_utilisateur',['id'=>$user->getId()]);
+    return $this->redirectToRoute('profil_utilisateur');
     }
     }
     $l=false;
@@ -241,17 +245,20 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
     #[Route('/utilisateurs/{id}', name: 'one_utilisateur')]
     public function getOne(UtilisateurRepository $repo, $id):Response
     {
+        $l=false;
         $user=$repo->find($id);
         $user->setPic( "/uploads/" . $user->getPic());
 
         return $this->render('utilisateur/one.html.twig',[
-            'user'=>$user
+            'user'=>$user,
+            'l'=>$l
         ]);
     }
 
     #[Route('/profil', name: 'profil_utilisateur')]
     public function Profil(UtilisateurRepository $repo,SessionInterface $session ):Response
     {
+        $l=true;
         $sUser=$session->get('user');
         if(!$sUser)
         {
@@ -262,7 +269,8 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
         $user->setPic( "/uploads/" . $user->getPic());
 
         return $this->render('utilisateur/one.html.twig',[
-            'user'=>$user
+            'user'=>$user,
+            'l'=>$l
         ]);
     }
 
@@ -294,7 +302,9 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
         }else
         {
 
+        $lastUser=$session->get('lastConnected');
         $form=$this->createForm(LoginForm::class);
+        $form->get('username')->setData($lastUser);
         $form->handleRequest($req);
         $lab=null;
     if($form->isSubmitted())
@@ -304,6 +314,9 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
         $password = $form->get('password')->getData();
 
        $user=$repo->findOneBy(['username'=>$username]);
+
+       $session->remove('lastConnected');
+       $session->set('lastConnected',$username);
 
       if(!$user)
       {
@@ -384,7 +397,12 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
         {
 
             $session->remove('aa');
-            return $this->redirectToRoute('one_utilisateur',['id'=>$user->getId()]);
+            //////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////////////////
+            $session->remove('user');
+            $session->set('user',$user);
+            return $this->redirectToRoute('profil_utilisateur');
 
         }else
         {
@@ -416,8 +434,46 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
 
 
 
+    #[Route('/passwordrez', name: 'MDPRez_utilisateur')]
+    public function entryPasswd(Request $req,UtilisateurRepository $repo, SessionInterface $session):Response
+    {
+        $form= $this->createFormBuilder()
+    ->add('PasswordOne', PasswordType::class,[
+        'attr'=> ['placeholder' => 'Password'],
+        'label'=>'Enter your current password.',
+    ]) 
+    ->add('Confirm', SubmitType::class)
+    ->getForm();
+    $sUser=$session->get('user');
+    $user=$repo->find($sUser->getId());
+    $form->handleRequest($req);
+    if($form->isSubmitted())
+    {
+        $pasw=$form->get('PasswordOne')->getData();
+        if($user->getPassword()==$pasw)
+        {
+            return $this->redirect('/mdpreset/'.$user->getId());
+        }else{
+            $pasw=$form->get('PasswordOne')->addError(new FormError('Wrong password'));
+        }
+    }
+
+
+
+        $l=false;
+        return $this->renderForm('utilisateur/reset.html.twig',[
+            'f' =>$form,
+            'l'=>$l
+        ]);
+    }
+
+
+
     #[Route('/mdpreset/{id}', name: 'passwordreset_utilisateur')]
-    public function resetPasword($id,UtilisateurRepository $repo, ManagerRegistry $manager, Request $req):Response
+    public function resetPasword($id,UtilisateurRepository $repo, ManagerRegistry $manager
+                                    , Request $req
+                                    ,SessionInterface $session
+                                    ,UtilisateurService $service):Response
     {
         $form= $this->createFormBuilder()
     ->add('PasswordOne', PasswordType::class,[
@@ -443,6 +499,11 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
             $one=$form->get('PasswordOne')->getData();
             $two=$form->get('PasswordTwo')->getData();
 
+            if($service->isWeakPassword($one))
+            {
+                $one=$form->get('PasswordOne')->addError(new FormError("Your new Password is weak"));
+            }
+
             if($one!=$two)
             {
                 $form->get('PasswordTwo')->addError(new FormError('Passwords mismatch !'));
@@ -451,6 +512,11 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
                 $user->setPassword($two);
                 $m->persist($user);
                 $m->flush();
+
+                $session->remove('user');
+                $session->set('user',$user);
+                
+                return $this->redirectToRoute('profil_utilisateur');
             }
 
         
@@ -458,9 +524,10 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
 
 
 
-
+        $l=true;
         return $this->renderForm('utilisateur/reset.html.twig',[
-            'f'=>$form
+            'f'=>$form,
+            'l'=>$l
         ]);
     }
 
@@ -526,11 +593,6 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
                                 $user->getEmail());
 
     }
-
-
-
-
-    
     $remainingAttempts = $session->get('aa', 4);
    
     $form2->handleRequest($re);
@@ -541,7 +603,10 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
         if($code==$entred)
         {
             $session->remove('aa');
-            return $this->redirectToRoute('one_utilisateur',['id'=>$user->getId()]);
+            ///////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////
+            //////////////////////////////////////////////////////////////
+            return $this->redirectToRoute('profil_utilisateur');
 
         }else
         {

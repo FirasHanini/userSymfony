@@ -8,7 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 use Symfony\Component\Form\FormBuilderInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 
-class UtilisateurType extends AbstractType
+class UtilisateurUpdateType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -39,9 +39,7 @@ class UtilisateurType extends AbstractType
             ->add('cin', null, [
                 'attr' => ['placeholder' => 'CIN'],
                 'label'=>'CIN',])
-     /*       ->add('age',null,[
-                'attr' => ['placeholder' => 'Age'],
-                'label'=>'Age',])*/
+  
             ->add('pic',FileType::class,[
                 'mapped'=>false,
                 'label'=>'Name',
@@ -50,15 +48,8 @@ class UtilisateurType extends AbstractType
             ->add('username', null, [
                 'attr' => ['placeholder' => 'Username'],
                 'label'=>'Username',])
+               
                 
-
-            ->add('password', PasswordType::class, [
-                'mapped'=>false,
-                'attr' => ['placeholder' => 'Password'],
-                'label'=>'Password',
-                ])
-            
-
             ->add('email', null, [
                 'attr' => ['placeholder' => 'Email'],
                 'label'=>'Email',])

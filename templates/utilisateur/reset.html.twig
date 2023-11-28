@@ -18,10 +18,12 @@
                                     {{form_label(f.PasswordOne)}}
                                     {{form_widget(f.PasswordOne)}}
                                     {{form_errors(f.PasswordOne)}}
-                                    
+
+                                    {% if l%}
                                     {{form_label(f.PasswordTwo)}}
                                     {{form_widget(f.PasswordTwo)}}
-                                    {{form_errors(fPasswordTwo.)}}
+                                    {{form_errors(f.PasswordTwo)}}
+                                    {% endif %}
                                     <br>
 
 
