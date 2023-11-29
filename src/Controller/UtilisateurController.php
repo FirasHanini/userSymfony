@@ -295,6 +295,7 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
     {
      //   $user= new Utilisateur();
       $sUser=$session->get('user');
+      $session->set('bool',true);
       
         if($sUser)
         {
@@ -360,14 +361,10 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
     ]) 
     ->add('Send', SubmitType::class)
     ->getForm();
+    $session->remove('tmp');
+    $session->remove('code');
 
-    $form2= $this->createFormBuilder()
-    ->add('code', IntegerType::class,[
-        'attr'=> ['placeholder' => 'Verification code'],
-        'label'=>'We sent an Email containing a verification code. Please paste it here.',
-    ]) 
-    ->add('Confirm', SubmitType::class)
-    ->getForm();
+    
     $isForm1Submitted=false;
     $code="";
 
@@ -380,56 +377,113 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
         if(!$user)
         {
             $form->get('username')->addError(new FormError('User not found!'));
-        }
+        }else {
+        $session->set('tmp',$user);
         $code= $service->codeGenerate();
+        $session->set('code',$code);
         $service->sendEmail('Password forgot',"Hello".$user->getUsername()."your verification code is: \n".$code,
                                 $user->getEmail());
-
-    }
-
-    $remainingAttempts = $session->get('aa', 4);
-    $form2->handleRequest($re);
-    if($form2->isSubmitted()&& !$isForm1Submitted)
-    {
-        
-        $entred=$form2->get('code')->getData();
-        if($code==$entred)
-        {
-
-            $session->remove('aa');
-            //////////////////////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////////
-            ///////////////////////////////////////////////////////////////////////
-            $session->remove('user');
-            $session->set('user',$user);
-            return $this->redirectToRoute('profil_utilisateur');
-
-        }else
-        {
-            $remainingAttempts--;
-            $session->set('aa', $remainingAttempts);
-            if($remainingAttempts<3)
-            {
-            $form2->get('code')->addError(new FormError('Wrong verification code! Try again.'));}
-
-            if( $remainingAttempts===0)
-            {
-                $session->remove('aa');
-              
-                return $this->redirectToRoute('login_utilisateur');
-            }
-            
-
+                                return $this->redirectToRoute('verif2_utilisateur');
         }
+
     }
+
+   
     
     return $this->renderForm('utilisateur/forgot.html.twig',[
 
         's'=> $isForm1Submitted,
         'f'=>$form,
+        
+    ]);
+}
+
+
+#[Route('/verif2', name: 'verif2_utilisateur')]
+public function codeVerifTwo(Request $req,SessionInterface $session):Response
+{
+$form2= $this->createFormBuilder()
+->add('code', IntegerType::class,[
+    'required'=>false,
+    'attr'=> ['placeholder' => 'Verification code'],
+    'label'=>'We sent an Email containing a verification code. Please paste it here.',
+]) 
+->add('Confirm', SubmitType::class)
+->getForm();
+
+$isForm1Submitted = true;
+$session->remove('aa');
+$remainingAttempts = $session->get('aa', 4);
+$code=$session->get('code');
+
+$user=$session->get('tmp');
+
+
+$form2->handleRequest($req);
+if($form2->isSubmitted())
+{
+    
+    $entred=$form2->get('code')->getData();
+    
+    if($code==$entred)
+    {
+        $session->remove('aa');
+        $session->set('user',$user);
+        $session->remove('tmp');
+        $session->remove('code');
+        
+        return $this->redirect('/mdpreset/'.$user->getId());
+
+    }else
+    {
+        $remainingAttempts--;
+        $session->set('aa', $remainingAttempts);
+        
+        if($remainingAttempts<3)
+        {
+        $form2->get('code')->addError(new FormError('Wrong verification code! Try again.'));}
+
+        if( $remainingAttempts===0)
+        {
+          
+            $session->remove('aa');
+            $session->remove('tmp');
+            $session->remove('code');
+            return $this->redirectToRoute('login_utilisateur');
+        }
+        
+
+    }
+}
+
+
+    return $this->renderForm('utilisateur/forgot.html.twig',[
+
+        's'=> $isForm1Submitted,
+        
         'ff'=>$form2
     ]);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -555,7 +609,10 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
 
 
     #[Route('/emailconnect', name: 'emailConnection_utilisateur')]
-    public function emailConnection(Request $req,Request $re, UtilisateurRepository $repo, UtilisateurService $service, SessionInterface $session):Response
+    public function emailConnection(Request $re
+                                    , UtilisateurRepository $repo
+                                    , UtilisateurService $service
+                                    , SessionInterface $session):Response
     {
         $session->remove('aa');
         $form = $this->createFormBuilder()
@@ -566,46 +623,81 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
     ->add('Send', SubmitType::class)
     ->getForm();
 
+  
+    $isForm1Submitted=false;
+    
+    
+    $code="";
+    $session->remove('tmp');
+    $session->remove('code');
+    
+   
+
+    $form->handleRequest($re);
+    if($form->isSubmitted())
+    {
+        
+        
+       
+        $username=$form->get('username')->getData();
+        $user=$repo->findOneBy(['username'=>$username]);
+        
+        if(!$user)
+        {
+            $form->get('username')->addError(new FormError('User not found!'));
+        }else{
+        
+        $session->set('tmp',$user);
+        $code= $service->codeGenerate();
+        $session->set('code',$code);
+        $service->sendEmail('Connection code',"Hello ".$user->getUsername()."your verification code is: \n".$code,
+                                $user->getEmail());
+
+                                return $this->redirectToRoute('verif_utilisateur');
+        }
+
+    }
+    return $this->renderForm('utilisateur/forgot.html.twig',[
+
+        's'=> $isForm1Submitted,
+        'f'=>$form,
+        
+    ]);
+}
+
+    #[Route('/verif', name: 'verif_utilisateur')]
+    public function codeVerif(Request $req,SessionInterface $session):Response
+    {
     $form2= $this->createFormBuilder()
     ->add('code', IntegerType::class,[
+        'required'=>false,
         'attr'=> ['placeholder' => 'Verification code'],
         'label'=>'We sent an Email containing a verification code. Please paste it here.',
     ]) 
     ->add('Confirm', SubmitType::class)
     ->getForm();
-    $isForm1Submitted=false;
-    
-    $code="";
 
-    $form->handleRequest($req);
-    if($form->isSubmitted())
-    {
-        $isForm1Submitted = true;
-        
-        $username=$form->get('username')->getData();
-        $user=$repo->findOneBy(['username'=>$username]);
-        if(!$user)
-        {
-            $form->get('username')->addError(new FormError('User not found!'));
-        }
-        $code= $service->codeGenerate();
-        $service->sendEmail('Connection code',"Hello".$user->getUsername()."your verification code is: \n".$code,
-                                $user->getEmail());
-
-    }
+    $isForm1Submitted = true;
+    $session->remove('aa');
     $remainingAttempts = $session->get('aa', 4);
+    $code=$session->get('code');
+    echo $code;
+    $user=$session->get('tmp');
+    
    
-    $form2->handleRequest($re);
+    $form2->handleRequest($req);
     if($form2->isSubmitted())
     {
         
         $entred=$form2->get('code')->getData();
+        
         if($code==$entred)
         {
             $session->remove('aa');
-            ///////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////
-            //////////////////////////////////////////////////////////////
+            $session->set('user',$user);
+            $session->remove('tmp');
+            $session->remove('code');
+            
             return $this->redirectToRoute('profil_utilisateur');
 
         }else
@@ -621,6 +713,8 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
             {
               
                 $session->remove('aa');
+                $session->remove('tmp');
+                $session->remove('code');
                 return $this->redirectToRoute('login_utilisateur');
             }
             
@@ -632,7 +726,7 @@ public function updateAuthor(Request $requ,ManagerRegistry $manager,$id,Utilisat
         return $this->renderForm('utilisateur/forgot.html.twig',[
 
             's'=> $isForm1Submitted,
-            'f'=>$form,
+            
             'ff'=>$form2
         ]);
     }
